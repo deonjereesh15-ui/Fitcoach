@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitness">
+<link rel="manifest" href="manifest.json">
+<title>Fitness OS</title>
+<style>
+:root{--bg:#080b14;--card:#121827;--card2:#171f31;--line:#263149;--text:#f8fafc;--muted:#9ba7bd;--accent:#8b6cff;--good:#39d98a;--warn:#ffca5c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#20294a 0,#080b14 45%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+main{max-width:680px;margin:auto;padding:calc(14px + env(safe-area-inset-top)) 14px calc(36px + env(safe-area-inset-bottom))}
+header{padding:10px 4px 18px}.eyebrow{text-transform:uppercase;letter-spacing:1.5px;color:#a99aff;font-size:11px;font-weight:900}h1{font-size:34px;letter-spacing:-1px;margin:5px 0}h2{margin:0 0 12px;font-size:20px}.muted{color:var(--muted)}
+.card{background:rgba(18,24,39,.94);border:1px solid var(--line);border-radius:22px;padding:17px;margin:11px 0;box-shadow:0 12px 35px rgba(0,0,0,.18)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--card2);border-radius:16px;padding:13px}.num{font-size:25px;font-weight:900}.label{font-size:11px;color:var(--muted);margin-top:3px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{background:#242d44;color:#d9def0;border-radius:99px;padding:6px 10px;font-size:11px;font-weight:900}
+button{border:0;border-radius:13px;padding:12px 15px;font-weight:900;background:#fff;color:#0b1020;margin:5px 5px 0 0}button.secondary{background:#273149;color:#fff}button.accent{background:var(--accent);color:#fff}
+.progress{height:10px;background:#252e45;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,#7156ff,#b19aff);transition:.3s}
+.exercise{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.exercise:last-child{border:0}.exercise input{width:22px;height:22px;accent-color:var(--accent)}.exercise.done span{text-decoration:line-through;color:#7e8aa1}
+.rem{padding:13px 0;border-bottom:1px solid var(--line)}.rem:last-child{border:0}.time{font-weight:900;min-width:54px;display:inline-block}
+textarea{width:100%;min-height:80px;background:#0d1321;border:1px solid var(--line);border-radius:14px;color:#fff;padding:12px;font:inherit;resize:vertical}
+.small{font-size:12px}.status{background:#1a2337;border-radius:13px;padding:10px;margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">12-WEEK PLAN</div><h1>Fitness OS</h1><div class="muted">Your daily training dashboard.</div></header>
+
+<section class="card">
+ <div class="row"><div><div class="muted small">TODAY</div><h2 id="workout">Loading…</h2></div><span id="day" class="pill"></span></div>
+ <div class="grid">
+  <div class="stat"><div class="num" id="week">1</div><div class="label">WEEK</div></div>
+  <div class="stat"><div class="num" id="pct">0%</div><div class="label">WORKOUT DONE</div></div>
+ </div>
+ <div style="margin-top:14px" class="progress"><div id="bar" class="bar"></div></div>
+ <div id="status" class="status small"></div>
+</section>
+
+<section class="card">
+ <div class="row"><h2>Workout</h2><span id="session" class="pill"></span></div>
+ <div id="exercises"></div>
+ <button class="secondary" id="reset">Reset workout</button>
+</section>
+
+<section class="card">
+ <h2>🔔 Notifications</h2>
+ <p class="muted small">Meal, steps and workout reminders.</p>
+ <button class="accent" id="enable">Enable notifications</button>
+ <button class="secondary" id="test">Test</button>
+ <div id="notifStatus" class="status small"></div>
+</section>
+
+<section class="card">
+ <h2>🍽️ Daily reminders</h2>
+ <div id="reminders"></div>
+</section>
+
+<section class="card">
+ <h2>📝 Today's notes</h2>
+ <textarea id="notes" placeholder="Write anything you want to remember…"></textarea>
+ <button class="accent" id="save">Save note</button>
+ <span id="saved" class="muted small"></span>
+</section>
+</main>
+<script>
+const W={
+1:["Push",["Bench Press 3×8–10","Incline Dumbbell Press 3×10","Shoulder Press 3×10","Lateral Raise 3×12–15","Tricep Pushdown 3×12"]],
+2:["Pull",["Lat Pulldown 3×10","Seated Row 3×10","Face Pull 3×12","Dumbbell Curl 3×12","Hammer Curl 3×12"]],
+3:["Legs",["Leg Press 3×10","Romanian Deadlift 3×10","Leg Curl 3×12","Leg Extension 3×12","Calf Raise 3×15","Plank 3×45–60s"]],
+4:["Upper",["Incline Bench 3×10","Lat Pulldown 3×10","Shoulder Press 3×10","Seated Row 3×10","Tricep Pushdown 3×12","Dumbbell Curl 3×12"]]
+};
+const R=[
+["08:00","Breakfast","3 eggs, 2 slices wholemeal toast, banana"],
+["13:00","Lunch","Chicken, rice, vegetables"],
+["16:00","Steps","Aim for 8,000–10,000 steps today"],
+["17:00","Workout","Today's training session"],
+["19:00","Dinner","Lean meat, potatoes/rice, vegetables"],
+["21:00","Evening","Greek yogurt or protein shake"]
+];
+const dateKey=()=>new Date().toISOString().slice(0,10), dow=()=>new Date().getDay()||7;
+function pday(){return ((dow()-1)%4)+1}
+function week(){let s=localStorage.getItem("start");if(!s){s=dateKey();localStorage.setItem("start",s)}return Math.min(12,Math.max(1,Math.floor((new Date(dateKey())-new Date(s))/604800000)+1))}
+function render(){
+ const d=pday(), w=W[d], k="done-"+dateKey(), done=JSON.parse(localStorage.getItem(k)||"[]");
+ document.getElementById("week").textContent=week();document.getElementById("day").textContent="Day "+dow();document.getElementById("session").textContent=w[0];document.getElementById("workout").textContent=w[0]+" Day";
+ document.getElementById("exercises").innerHTML=w[1].map((x,i)=>`<label class="exercise ${done.includes(i)?"done":""}"><input type="checkbox" data-i="${i}" ${done.includes(i)?"checked":""}><span>${x}</span></label>`).join("");
+ document.querySelectorAll("#exercises input").forEach(c=>c.onchange=()=>{let a=JSON.parse(localStorage.getItem(k)||"[]"),i=+c.dataset.i;if(c.checked&&!a.includes(i))a.push(i);if(!c.checked)a=a.filter(x=>x!==i);localStorage.setItem(k,JSON.stringify(a));render()});
+ let pct=Math.round(done.length/w[1].length*100);document.getElementById("pct").textContent=pct+"%";document.getElementById("bar").style.width=pct+"%";document.getElementById("status").textContent=pct===100?"Workout complete — nice work.":"Complete each exercise as you go.";
+ document.getElementById("reminders").innerHTML=R.map(x=>`<div class="rem"><span class="time">${x[0]}</span><b>${x[1]}</b><br><span class="muted small">${x[2]}</span></div>`).join("");
+ document.getElementById("notes").value=localStorage.getItem("note-"+dateKey())||"";
+}
+async function enable(){if(!("Notification"in window)){alert("Notifications are not supported here.");return}let p=await Notification.requestPermission();document.getElementById("notifStatus").textContent=p==="granted"?"Notifications enabled.":"Permission not granted."}
+function push(t,b){if("Notification"in window&&Notification.permission==="granted")new Notification(t,{body:b})}
+function check(){let n=new Date(),t=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0"),key=dateKey()+"-"+t;if(localStorage.getItem("sent")===key)return;let r=R.find(x=>x[0]===t);if(r){localStorage.setItem("sent",key);push(r[1],r[2])}}
+document.getElementById("enable").onclick=enable;document.getElementById("test").onclick=()=>push("Fitness OS","Your notifications are working 🔔");
+document.getElementById("reset").onclick=()=>{localStorage.removeItem("done-"+dateKey());render()};
+document.getElementById("save").onclick=()=>{localStorage.setItem("note-"+dateKey(),document.getElementById("notes").value);document.getElementById("saved").textContent=" Saved ✓";setTimeout(()=>document.getElementById("saved").textContent="",1500)};
+render();check();setInterval(check,30000);
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body></html>

@@ -1,0 +1,17 @@
+{
+  "name": "Fitness OS \u2014 12 Week Plan",
+  "short_name": "Fitness OS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080b14",
+  "theme_color": "#080b14",
+  "description": "12-week fitness dashboard with workouts, reminders and notes.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
